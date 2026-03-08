@@ -1,0 +1,25 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="PyPackageRequirementsInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredPackages">
+        <list>
+          <option value="tensorflow" />
+          <option value="protobuf" />
+          <option value="deepface" />
+          <option value="ultralytics" />
+          <option value="opencv-python" />
+          <option value="openai-whisper" />
+          <option value="torch" />
+          <option value="torchvision" />
+          <option value="torchaudio" />
+          <option value="spacy" />
+          <option value="pandas" />
+          <option value="numpy" />
+          <option value="yt-dlp" />
+          <option value="scikit-learn" />
+        </list>
+      </option>
+    </inspection_tool>
+  </profile>
+</component>
