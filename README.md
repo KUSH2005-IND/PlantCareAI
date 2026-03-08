@@ -203,6 +203,9 @@ Evaluation metrics used:
 
 ---
 
+### Metrics
+![Prediction Result](static/outputs/metric.png)
+
 # Web Application
 
 The trained model is deployed through a **Flask-based web application** that allows users to upload leaf images and receive predictions.
@@ -251,6 +254,8 @@ The backend is implemented using **Flask**, which handles:
 * prediction processing
 * returning results to the user interface
 
+### Web Interface
+![Web page Output](static/outputs/Output(PlantCareAI).png)
 ### Prediction Pipeline
 
 ```
