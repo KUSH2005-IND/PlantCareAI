@@ -1,1 +1,2 @@
 *.ipynb linguist-detectable=false
+notebook/** linguist-detectable=false
