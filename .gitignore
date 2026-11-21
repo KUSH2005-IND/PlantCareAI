@@ -18,3 +18,4 @@ PlantCareAI_GPU/
 
 # Runtime uploads & generated outputs
 !static/uploads/.gitkeep
+.ai/

@@ -1,2 +1,3 @@
 *.ipynb linguist-detectable=false
 notebook/** linguist-detectable=false
+templates/** linguist-detectable=false
