@@ -1,163 +1,54 @@
 ﻿# PlantCare AI
 
-**Deep Learning-Based Plant Disease Detection System**
+**Deep Learning-Based Plant Disease Classification & Insect Pest Detection System**
 
-PlantCare AI is a computer vision application that identifies plant diseases from leaf images using a convolutional neural network. The project combines **deep learning for image classification** with a **Flask web application** to allow users to upload plant leaf images and receive instant disease predictions.
-
-The system leverages **transfer learning with MobileNetV2**, trained on a large plant pathology dataset, and provides predictions through a clean web interface.
+PlantCare AI is an end-to-end computer vision web application that diagnoses **38 plant leaf diseases** and detects **102 agricultural insect pest species** from plant images. The system pairs a **MobileNetV2** transfer-learning classifier with an edge-optimized **YOLO26n** object detector exported to **LiteRT (`.tflite`)**, unified behind a **Flask** web interface with host-crop pest filtering.
 
 ---
 
-# Project Overview
+## System Capabilities
 
-Plant diseases significantly affect agricultural productivity and food security. Early detection helps farmers and gardeners prevent crop loss and apply timely treatment.
-
-PlantCare AI provides:
-
-* Automated **plant disease identification**
-* **Image-based diagnosis**
-* **Real-time predictions through a web interface**
-* A scalable framework for future agricultural AI applications
+- **Dual-Mode Visual Diagnosis:** Switch between **Leaf Disease Classification** (38 classes) and **Insect Pest Detection** (102 classes) from a single web interface.
+- **Host-Crop Class Masking:** Filter pest predictions across 8 agricultural crop taxonomies (*Rice, Corn, Wheat, Beet, Alfalfa, Vitis/Grape, Citrus, Mango*) at post-processing time to eliminate cross-crop false positives.
+- **Edge-Ready Quantized Inference:** Runs `w8a32`-quantized LiteRT (`~2.9 MB`) YOLO26n models with letterbox preprocessing, planar `NCHW` tensor formatting, and OpenCV Non-Maximum Suppression (NMS).
+- **Visual Bounding-Box Annotations:** Renders labeled bounding boxes, species names, host crops, and per-instance confidence scores directly onto uploaded images.
 
 ---
 
-# Dataset
+## Datasets
 
-The model was trained using the **New Plant Diseases Dataset (Augmented)** available on Kaggle.
+### 1. Plant Disease Dataset
+- **Source:** [New Plant Diseases Dataset (Augmented)](https://www.kaggle.com/datasets/vipoooool/new-plant-diseases-dataset)
+- **Scale & Scope:** ~87,000 RGB leaf images across **38 plant-disease categories** covering crops such as Apple, Corn, Grape, Potato, and Tomato.
+- **Example Classes:** `Apple___Apple_scab`, `Apple___Black_rot`, `Corn___Common_rust`, `Potato___Early_blight`, `Tomato___Early_blight`, `Tomato___Late_blight`.
 
-Dataset Source:
-https://www.kaggle.com/datasets/vipoooool/new-plant-diseases-dataset
-
-### Dataset Characteristics
-
-| Feature        | Value                                    |
-| -------------- | ---------------------------------------- |
-| Total Images   | ~87,000                                  |
-| Classes        | 38 plant disease categories              |
-| Image Type     | RGB plant leaf images                    |
-| Resolution     | Varying resolutions                      |
-| Plants Covered | Apple, Corn, Grape, Potato, Tomato, etc. |
-
-### Example Classes
-
-* Apple___Apple_scab
-* Apple___Black_rot
-* Corn___Common_rust
-* Tomato___Late_blight
-* Tomato___Early_blight
-* Potato___Early_blight
-* Grape___Black_rot
-
-Each class represents **a specific plant and its disease condition**.
+### 2. Insect Pest Dataset (IP102 Detection Split)
+- **Source:** IP102 Large-Scale Benchmark Dataset for Insect Pest Recognition (Pascal VOC XML converted to normalized YOLO format).
+- **Scale & Scope:** **18,975 annotated images** across **102 pest species** organized under 8 host crops (`13,659` train / `1,518` validation / `3,798` held-out test images).
+- **Host Crop Coverage:** Rice (14 classes), Corn (13), Wheat (9), Beet (8), Alfalfa (13), Vitis/Grape (12), Citrus (18), and Mango (15).
 
 ---
 
-# Data Preprocessing
+## Data Preprocessing & Augmentation
 
-Proper data preprocessing is critical for deep learning models. The following preprocessing steps were applied before training.
+### Disease Classification Pipeline (`src/disease/preprocessing.py`)
+- **Resizing & Normalization:** Images are resized to `224 × 224 × 3` RGB and normalized from `[0, 255]` to `[0, 1]` (`rescale = 1./255`).
+- **Training Augmentation (`ImageDataGenerator`):** Random rotation (`25°`), zoom (`0.2`), shear (`0.2`), and horizontal flip.
 
-## 1. Image Resizing
-
-All images were resized to:
-
-```
-224 × 224 × 3
-```
-
-This matches the input size expected by **MobileNetV2**.
+### Pest Detection Pipeline (`src/pest/detector.py`)
+- **Letterbox & Layout Conversion:** Aspect-ratio-preserving resize with `114` gray padding to `640 × 640`, normalized to `[0.0, 1.0]` `float32`, and transposed to planar `NCHW` (`(1, 3, 640, 640)`).
+- **Training Augmentation:** Mosaic tiling (`1.0`, disabled for the final 10 epochs via `close_mosaic=10`), rotation (`±15°`), scale (`0.5`), horizontal/vertical flips (`0.5`), HSV color jitter, random erasing (`0.4`), and Albumentations blur/CLAHE.
 
 ---
 
-## 2. Pixel Normalization
+## Model Architectures
 
-Pixel values were scaled from:
-
-```
-[0,255] → [0,1]
-```
-
-Using:
-
-```python
-rescale = 1./255
-```
-
-Benefits:
-
-* faster convergence
-* improved gradient stability
-* reduced numerical instability
-
----
-
-## 3. Data Augmentation
-
-To improve generalization and prevent overfitting, the training images were augmented using:
-
-```python
-ImageDataGenerator(
-    rescale=1./255,
-    rotation_range=25,
-    zoom_range=0.2,
-    shear_range=0.2,
-    horizontal_flip=True
-)
-```
-
-### Augmentation Techniques
-
-| Technique       | Purpose                             |
-| --------------- | ----------------------------------- |
-| Rotation        | Handles different leaf orientations |
-| Zoom            | Robustness to scale variation       |
-| Shear           | Introduces geometric variation      |
-| Horizontal Flip | Expands dataset diversity           |
-
----
-
-## 4. Dataset Split
-
-The dataset already provides predefined splits:
-
-| Split      | Purpose                |
-| ---------- | ---------------------- |
-| Train      | Model learning         |
-| Validation | Performance monitoring |
-
----
-
-# Model Architecture
-
-The project uses **transfer learning with MobileNetV2**, a lightweight CNN designed for efficient image classification.
-
-MobileNetV2 is particularly suitable because it:
-
-* has **low computational cost**
-* performs well on image classification tasks
-* is optimized for edge and mobile devices
-
----
-
-## Transfer Learning Strategy
-
-The pretrained MobileNetV2 model was loaded with **ImageNet weights**.
-
-Steps:
-
-1. Load pretrained backbone
-2. Freeze convolutional layers
-3. Add custom classification head
-4. Train final layers on plant disease dataset
-
----
-
-## Model Architecture
-
-```
-Input Image (224x224x3)
+### 1. Plant Disease Classifier (MobileNetV2)
+```text
+Input Image (224 × 224 × 3)
         │
         ▼
-MobileNetV2 (Pretrained Backbone)
+MobileNetV2 (ImageNet Pretrained Backbone)
         │
         ▼
 Global Average Pooling
@@ -166,555 +57,167 @@ Global Average Pooling
 Dense Layer (256 units, ReLU)
         │
         ▼
-Softmax Output Layer (38 classes)
+Softmax Output Layer (38 Classes)
 ```
+
+### 2. Insect Pest Detector (YOLO26n)
+- **Backbone & Neck:** Lightweight `C3k2` blocks, `SPPF`, and `C2PSA` spatial attention (`2.41M` fused parameters, `5.5 GFLOPs`).
+- **Detection Head:** Distribution-Focal-Loss-free (`l1_loss`) regression head trained with `ProgLoss + STAL` (Small-Target-Aware Label Assignment) for small field pests.
+- **Deployment Exports:** Quantized `w8a32` LiteRT models at `640 × 640` (`~2.9 MB` primary) and `416 × 416` (`~2.9 MB` fast preview), outputting `(1, 106, 8400)` raw tensors for crop-masked decoding and NMS.
 
 ---
 
-# Training Configuration
+## Training Configuration & Evaluation
 
-| Parameter     | Value                    |
-| ------------- | ------------------------ |
-| Optimizer     | Adam                     |
-| Loss Function | Categorical Crossentropy |
-| Batch Size    | 32                       |
-| Epochs        | 5                        |
-| Input Size    | 224×224                  |
+### Disease Model (`MobileNetV2`)
+| Parameter / Metric | Value |
+| :--- | :--- |
+| Optimizer / Loss | Adam / Categorical Crossentropy |
+| Batch Size / Epochs | `32` / `5` epochs at `224 × 224` |
+| Training Accuracy | `~94%` |
+| Validation Accuracy | `~91%` (Loss `~0.18`) |
 
----
+![Disease Model Training Metrics](static/outputs/metric.png)
 
-# Model Evaluation
+### Pest Model (`YOLO26n` on IP102)
+| Parameter / Metric | Value |
+| :--- | :--- |
+| Optimizer / Schedule | AdamW (`lr0=0.001`, `cos_lr=True`, `weight_decay=0.0005`) |
+| Batch Size / Resolution | `32` / `640 × 640` (38 epochs on Tesla T4) |
+| **Validation (`1,518` imgs / `1,873` instances)** | **`mAP50 = 0.599`** (`0.602` peak) · **`mAP50-95 = 0.370`** · Recall `0.631` · Precision `0.528` |
+| **Held-Out Test (`3,798` imgs / `4,444` instances)** | **`mAP50 = 0.574`** · **`mAP50-95 = 0.359`** · Recall `0.599` · Precision `0.542` |
 
-The trained model achieved the following performance:
-
-| Metric              | Value |
-| ------------------- |-------|
-| Training Accuracy   | ~94%  |
-| Validation Accuracy | ~91%  |
-| Loss                | ~0.18 |
-
-Evaluation metrics used:
-
-* Accuracy
-* Precision
-* Recall
-* F1-score
-* Confusion matrix
+![YOLO26n Training and Validation Results](models/pest/ip102_yolov26n_baseline/results/results.png)
 
 ---
 
-### Metrics
-![Prediction Result](static/outputs/metric.png)
+## Web Application & Inference Pipeline
 
-# Web Application
+The backend (`app.py`) routes uploaded images through `utils/predict.py` to either `src/disease/classifier.py` or `src/pest/detector.py`:
 
-The trained model is deployed through a **Flask-based web application** that allows users to upload leaf images and receive predictions.
+```text
+User Upload (Image + Scan Mode + Optional Host Crop)
+        │
+        ▼
+Flask Server (app.py -> utils/predict.py)
+        ├──► [Leaf Disease Mode] ──► Resize (224×224) ──► MobileNetV2 (.h5) ──► Disease Label + Confidence
+        │
+        └──► [Insect Pest Mode]  ──► Letterbox (640×640 NCHW) ──► YOLO26n (.tflite)
+                                           │
+                                           ▼
+                                 Crop Class Masking + OpenCV NMS
+                                           │
+                                           ▼
+                                 Annotated Image (static/outputs/) + Detections Table
+```
 
-Framework used:
+### Web Interface & Detection Output
 
-* Flask (backend)
-* HTML + Bootstrap (frontend)
+![Disease Prediction Interface](static/outputs/crop_disease_demo.png)
+
+![Pest Detection Demo Output](static/outputs/pest_demo.png)
 
 ---
 
-#  Frontend
+## Project Structure
 
-The user interface includes:
-
-### Features
-
-* Image upload
-* Image preview
-* Prediction result display
-* Confidence score visualization
-* Responsive layout
-
-The frontend uses **Bootstrap** to provide a modern and clean UI.
-
-### User Workflow
-
-```
-Upload leaf image
-        ↓
-Preview appears
-        ↓
-Click "Predict"
-        ↓
-Prediction + confidence score displayed
-```
-
----
-
-# Backend
-
-The backend is implemented using **Flask**, which handles:
-
-* file uploads
-* model loading
-* prediction processing
-* returning results to the user interface
-
-### Web Interface
-![Web page Output](static/outputs/Output(PlantCareAI).png)
-### Prediction Pipeline
-
-```
-User Upload
-     │
-     ▼
-Flask Server
-     │
-     ▼
-Image Preprocessing
-(resize + normalization)
-     │
-     ▼
-CNN Model Inference
-     │
-     ▼
-Disease Prediction
-     │
-     ▼
-Display Result Page
-```
-
----
-
-# Project Structure
-
-```
-PlantCareAI
+```text
+PlantCareAI/
+├── app.py                                                 # Flask application entry point
+├── requirements.txt                                       # Python dependencies
+├── README.md
 │
-├── app.py
-├── requirements.txt
+├── data/
+│   ├── processed/ip102/                                   # Converted YOLO dataset, splits & class distribution
+│   └── raw/ip102/                                         # Original Pascal VOC XML annotations & images
 │
-├── models
-│   ├── plant_disease_model.h5
-│   └── class_indices.json
+├── models/
+│   ├── disease/                                           # MobileNetV2 disease classifier (.h5, .tflite, labels)
+│   └── pest/
+│       ├── ip102_yolov26n_baseline/                       # Primary YOLO26n model, w8a32 .tflite & test metrics
+│       ├── ip102_yolov8n_baseline/                        # Baseline YOLOv8n comparison run
+│       └── cpu_smoke_test/                                # Initial verification run
 │
-├── notebook
-│   └── plantcareai-notebook.ipynb
+├── notebook/
+│   ├── pest_model_yolo26n.ipynb                           # YOLO26n IP102 training & LiteRT export notebook
+│   ├── pest_model_yolov8n.ipynb                           # YOLOv8n training notebook
+│   └── plantcareai-notebook.ipynb                         # MobileNetV2 disease classification notebook
 │
-├── static
-│   └── uploads
+├── scripts/
+│   └── pest_prep/                                         # Dataset conversion, box validation & audit scripts
 │
-├── templates
-│   ├── index.html
-│   └── result.html
+├── src/
+│   ├── advisory/                                          # Agronomic guidance module
+│   ├── disease/                                           # Leaf disease preprocessing & inference
+│   └── pest/                                              # YOLO26n LiteRT detector, NMS & crop-pest taxonomy map
 │
-└── utils
-    └── predict.py
+├── static/
+│   ├── outputs/                                           # Annotated pest outputs & evaluation plots
+│   └── uploads/                                           # User-uploaded images
+│
+├── templates/
+│   ├── index.html                                         # Mode-aware upload UI with host-crop filter
+│   └── result.html                                        # Prediction & multi-pest bounding-box results view
+│
+└── utils/
+    └── predict.py                                         # Unified disease/pest prediction router
 ```
 
 ---
 
-#  Running the Project
+## Running the Project
 
-## 1. Clone Repository
+1. **Clone the repository:**
+   ```bash
+   git clone <repository-url>
+   cd PlantCareAI
+   ```
 
-```
-git clone <repository-url>
-cd PlantCareAI
-```
+2. **Create and activate a virtual environment:**
+   ```bash
+   python -m venv .venv
+   # Windows PowerShell:
+   .venv\Scripts\Activate.ps1
+   ```
 
----
+3. **Install dependencies:**
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-## 2. Create Virtual Environment
-
-```
-python -m venv venv
-```
-
-Activate environment:
-
-Windows:
-
-```
-venv\Scripts\activate
-```
-
----
-
-## 3. Install Dependencies
-
-```
-pip install -r requirements.txt
-```
+4. **Start the Flask server:**
+   ```bash
+   python app.py
+   ```
+   Open `http://127.0.0.1:5000` in your browser.
 
 ---
 
-## 4. Run Flask Application
+## Example Outputs
 
-```
-python app.py
-```
+- **Leaf Disease Mode (`Tomato leaf image`):**
+  ```text
+  Tomato : Early Blight
+  Top Confidence: 94.3%
+  ```
 
-Open browser:
-
-```
-http://127.0.0.1:5000
-```
-
----
-
-# Example Output
-
-Input: Tomato leaf image
-
-Output:
-
-```
-Tomato : Early Blight
-Confidence: 94.3%
-```
+- **Insect Pest Mode (`Rice field sample, Host Crop = Rice`):**
+  ```text
+  Rice : Rice Leaf Roller
+  Top Confidence: 87.9%
+  BBox [x1, y1, x2, y2]: 112, 84, 346, 291
+  ```
 
 ---
 
-# Future Improvements
+## Technologies Used
 
-Potential enhancements include:
-
-* Grad-CAM visualization for explainable AI
-* Mobile deployment
-* Larger multi-crop datasets
-* Real-time camera detection
-* Disease treatment recommendations
-* Integration with agricultural advisory systems
+- **Deep Learning & Edge Inference:** TensorFlow / Keras, LiteRT (`.tflite`), PyTorch, Ultralytics YOLO26
+- **Computer Vision & Data Processing:** OpenCV, NumPy, Pillow
+- **Web Backend & Frontend:** Flask, HTML5, CSS3, JavaScript
 
 ---
 
-# Conclusion
-
-PlantCare AI demonstrates how **deep learning and computer vision can be applied to agriculture** for automated disease detection.
-
-The project combines:
-
-* data preprocessing
-* transfer learning
-* model evaluation
-* web deployment
-
-to build an end-to-end AI application capable of diagnosing plant diseases from leaf images.
-
----
-
-# Technologies Used
-
-* Python
-* TensorFlow / Keras
-* Flask
-* NumPy
-* Pillow
-* Bootstrap
-* HTML/CSS
-
----
-
-Future Implementations for PlantCare AI
-
-PlantCare AI currently provides an automated system for plant disease detection using deep learning and a web interface. While the current system successfully classifies plant diseases from leaf images, there are several opportunities to enhance the project further and make it more impactful for real-world agricultural applications.
-
-The following sections describe potential future implementations that can improve **model intelligence, usability, scalability, and agricultural relevance**.
-
----
-
-# 1. Explainable AI with Grad-CAM Visualization
-
-## Motivation
-Deep learning models are often considered **black-box systems** because it is difficult to understand how they make predictions. For agricultural applications, farmers and researchers need to know **which part of the leaf the model used to detect the disease**.
-
-## Proposed Solution
-Integrate **Gradient-weighted Class Activation Mapping (Grad-CAM)** to visualize the regions of the leaf that contributed to the prediction.
-
-Grad-CAM works by:
-1. Computing gradients of the predicted class with respect to convolutional feature maps.
-2. Generating a heatmap that highlights important regions in the image.
-3. Overlaying this heatmap on the original leaf image.
-
-## Expected Output
-
-
-Original Leaf Image
-+
-Heatmap Highlighting Infected Region
-
-
-## Benefits
-- Improves **model interpretability**
-- Helps users **verify predictions visually**
-- Increases trust in AI-based diagnosis
-
----
-
-# 2. Disease Severity Estimation
-
-## Motivation
-The current system only identifies the **type of disease**, but farmers also need to know **how severe the infection is**.
-
-## Proposed Approach
-Extend the model to estimate the **percentage of infected leaf area**.
-
-Possible approaches include:
-
-### Pixel-Level Infection Detection
-Use segmentation models to identify infected regions.
-
-### CNN Regression Head
-Predict severity percentage directly.
-
-Example output:
-
-
-Disease: Tomato Early Blight
-Severity: 35% infected area
-Recommended Action: Moderate treatment required
-
-
-## Potential Models
-- U-Net
-- Mask R-CNN
-- Attention-based CNNs
-
-## Benefits
-- More informative predictions
-- Enables **precision agriculture**
-
----
-
-# 3. Multi-Crop and Multi-Dataset Training
-
-## Motivation
-The current dataset focuses on specific plant species. Real agricultural environments involve **many crops and varying disease conditions**.
-
-## Proposed Enhancement
-Combine multiple datasets to improve generalization.
-
-Possible datasets include:
-
-- PlantVillage
-- PlantDoc
-- AI Challenger Crop Dataset
-
-## Techniques
-- Domain adaptation
-- Dataset balancing
-- Cross-dataset validation
-
-## Expected Outcome
-A model capable of detecting diseases across **multiple crops and environments**.
-
----
-
-# 4. Real-Time Mobile Application
-
-## Motivation
-Farmers primarily use **smartphones** for field work.
-
-## Proposed Implementation
-
-Convert the trained model to **TensorFlow Lite** and deploy it in a mobile application.
-
-Steps:
-
-1. Convert model to TensorFlow Lite format
-2. Build mobile app using Flutter or React Native
-3. Integrate real-time camera detection
-
-Workflow:
-
-
-Camera Capture
-↓
-Leaf Image
-↓
-Mobile CNN Model
-↓
-Disease Prediction
-
-
-## Benefits
-- Portable AI tool
-- Works directly in agricultural fields
-- Offline inference capability
-
----
-
-# 5. Automated Treatment Recommendation System
-
-## Motivation
-Detecting a disease is useful, but farmers also need **actionable guidance**.
-
-## Proposed Feature
-Create a disease knowledge base mapping diseases to treatments.
-
-Example output:
-
-
-Disease: Potato Late Blight
-
-Recommended Actions:
-• Remove infected leaves
-• Apply copper-based fungicide
-• Improve ventilation in crop area
-
-
-## Implementation Options
-- Rule-based expert system
-- Agricultural database integration
-- Machine learning recommendation models
-
----
-
-# 6. Leaf Segmentation for Improved Accuracy
-
-## Motivation
-Background noise such as soil, sky, or other plants can reduce classification accuracy.
-
-## Proposed Solution
-Add a preprocessing stage that isolates the leaf.
-
-Possible techniques:
-
-- Semantic segmentation
-- Background removal models
-- Color-based segmentation
-
-Pipeline:
-
-
-Input Image
-↓
-Leaf Segmentation
-↓
-Clean Leaf Image
-↓
-Disease Classification
-
-
-## Expected Benefits
-- Improved model accuracy
-- Better feature extraction
-
----
-
-# 7. Active Learning for Continuous Model Improvement
-
-## Motivation
-Agricultural environments constantly change and new disease variations may appear.
-
-## Proposed System
-Implement an **active learning pipeline** where the model improves from user inputs.
-
-Workflow:
-
-1. User uploads new images
-2. Low-confidence predictions are flagged
-3. Experts review and label those samples
-4. Model retrains periodically
-
-## Benefits
-- Continuous learning
-- Adapts to new disease patterns
-
----
-
-# 8. Multi-Modal Disease Diagnosis
-
-## Motivation
-Disease detection may depend on additional factors besides leaf appearance.
-
-Possible factors include:
-
-- soil quality
-- temperature
-- humidity
-- crop growth stage
-
-## Proposed Enhancement
-Integrate multiple data sources.
-
-Example architecture:
-
-
-Leaf Image
-Weather Data
-Soil Data
-↓
-Multi-modal Neural Network
-↓
-Disease Prediction
-
-
-## Potential Approaches
-- CNN + tabular data fusion
-- Transformer-based multi-modal models
-
----
-
-# 9. Cloud-Based AI Agriculture Platform
-
-## Motivation
-To support large-scale agricultural deployment, the system should be scalable.
-
-## Proposed Architecture
-
-
-Web/Mobile Client
-↓
-Cloud API
-↓
-Model Inference Server
-↓
-Prediction Result
-
-
-Technologies:
-
-- Docker containers
-- Kubernetes orchestration
-- AWS SageMaker or Google Cloud AI
-
-## Benefits
-- Supports thousands of users
-- Easy model updates
-- Centralized infrastructure
-
----
-
-# 10. Early Disease Detection with Temporal Monitoring
-
-## Motivation
-Plant diseases often develop gradually. Detecting early symptoms helps reduce crop damage.
-
-## Proposed Approach
-Use **time-series image analysis**.
-
-Farmers capture plant images periodically.
-
-Example:
-
-
-Day 1
-Day 3
-Day 7
-Day 10
-
-
-A temporal model analyzes disease progression.
-
-Possible techniques:
-
-- Recurrent Neural Networks
-- Vision Transformers
-- Temporal CNN models
-
-## Impact
-- Earlier detection
-- Reduced pesticide usage
-- Higher crop yield
-
----
-
-# License
+## License
 
 This project is for educational and research purposes.

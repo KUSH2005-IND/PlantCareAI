@@ -6,3 +6,15 @@ __pycache__/
 *.pyd
 .ipynb_checkpoints
 static/uploads/*
+
+# Datasets & archives
+data/
+*.zip
+
+# Heavy model checkpoints (keep lightweight .tflite models tracked)
+*.pt
+*.h5
+PlantCareAI_GPU/
+
+# Runtime uploads & generated outputs
+!static/uploads/.gitkeep
