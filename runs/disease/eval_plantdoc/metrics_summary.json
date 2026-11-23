@@ -1,0 +1,44 @@
+{
+  "dataset": "PlantDoc-Dataset (test split)",
+  "num_test_images": 472,
+  "num_evaluated_classes": 27,
+  "model_artifacts": {
+    "baseline_h5_mb": 12.99,
+    "finetuned_keras_mb": 25.73,
+    "edge_tflite_mb": 9.75,
+    "total_params": 2595686
+  },
+  "latency_cpu": {
+    "keras_batch_ms_per_img": 18.61,
+    "tflite_single_ms_per_img": 7.78,
+    "tflite_fps": 128.5
+  },
+  "baseline_zero_shot": {
+    "top1_acc": 28.39,
+    "top3_acc": 49.15,
+    "crop_aware_acc": 50.85,
+    "macro_precision": 33.68,
+    "macro_recall": 28.14,
+    "macro_f1": 25.74,
+    "weighted_f1": 26.77
+  },
+  "finetuned_keras": {
+    "top1_acc": 60.59,
+    "top3_acc": 83.05,
+    "crop_aware_acc": 79.24,
+    "macro_precision": 63.75,
+    "macro_recall": 60.06,
+    "macro_f1": 59.55,
+    "weighted_f1": 59.88
+  },
+  "edge_tflite": {
+    "top1_acc": 60.59,
+    "top3_acc": 83.05,
+    "crop_aware_acc": 79.24,
+    "macro_precision": 63.75,
+    "macro_recall": 60.06,
+    "macro_f1": 59.55,
+    "weighted_f1": 59.88,
+    "max_prob_diff_vs_keras": 6e-06
+  }
+}

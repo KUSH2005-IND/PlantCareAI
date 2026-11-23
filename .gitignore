@@ -15,6 +15,7 @@ data/
 *.pt
 *.h5
 PlantCareAI_GPU/
+/models/llm/*.pte
 
 # Runtime uploads & generated outputs
 !static/uploads/.gitkeep

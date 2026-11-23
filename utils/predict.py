@@ -16,5 +16,5 @@ def predict_image(
     if mode == "pest":
         return predict_pest(img_path, crop=crop)
 
-    disease, confidence = predict_disease(img_path)
+    disease, confidence = predict_disease(img_path, crop=crop)
     return disease, confidence, img_path.replace("\\", "/"), []
