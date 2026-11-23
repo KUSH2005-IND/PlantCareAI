@@ -153,6 +153,8 @@ The [checked-in PlantDoc report](runs/disease/eval_plantdoc/metrics_summary.json
 | PlantDoc fine-tuned Keras | 60.59% | 79.24% |
 | Edge LiteRT export | 60.59% | 79.24% |
 
+![Crop baseline metrics](static/outputs/metric.png)
+
 ![PlantDoc accuracy comparison across the baseline, fine-tuned model, and edge export](runs/disease/eval_plantdoc/domain_shift_comparison.png)
 
 To rerun the evaluation, provision the baseline `plant_disease_model.h5`, the fine-tuned model and LiteRT export, and `data/PlantDoc-Dataset/test`. Run `python scripts/crop_disease_prep/eval_disease_metric.py` after installing the evaluation dependencies, including Matplotlib.
@@ -169,8 +171,6 @@ The supplied YOLO26n run used AdamW, cosine scheduling, `640 × 640` inputs, a b
 These are reported offline training and evaluation results. Android speed and per-class detection performance need device-level validation of the shipped export. See the [YOLO26n notebook](notebook/pest_model_yolo26n.ipynb) for the training workflow.
 
 #### Pest evaluation visuals
-
-![Pest detection metrics](static/outputs/metric.png)
 
 ![YOLO26n IP102 training and validation curves](models/pest/ip102_yolov26n_baseline/results/results.png)
 
