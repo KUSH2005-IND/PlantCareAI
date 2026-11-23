@@ -5,15 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fbab830e-da2c-4985-add6-66772bfacbf8" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/runs/pest/results/BoxF1_curve.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/runs/pest/results/BoxPR_curve.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/runs/pest/results/confusion_matrix_normalized.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/runs/pest/results/predictions.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/runs/pest/results/results.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/scripts/crop_disease_prep/convert_finetuned_to_litert.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/scripts/crop_disease_prep/eval_disease_metric.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/scripts/crop_disease_prep/plantdoc_finetune.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/data/PlantDoc-Dataset/LICENSE.txt" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/data/PlantDoc-Dataset/PlantDoc_Examples.png" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/data/PlantDoc-Dataset/README.md" beforeDir="false" />
@@ -2589,10 +2582,6 @@
       <change beforePath="$PROJECT_DIR$/data/PlantDoc-Dataset/train/grape leaf/trim-the-stem.jpg" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/data/PlantDoc-Dataset/train/grape leaf/vine-leaves-10824119.jpg" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/data/PlantDoc-Dataset/train/grape leaf/young-fresh-grape-leaf-picture-id183867740?k=6&amp;m=183867740&amp;s=612x612&amp;w=0&amp;h=Q8_s3Yw7p_VKQjda-mZPl9rN4lDmpVjjbMUk95HtVFk=.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/notebook/pest_model_yolo26n.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/notebook/pest_model_yolo26n.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/notebook/pest_model_yolov8n.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/notebook/pest_model_yolov8n.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/disease/classifier.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/disease/classifier.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/predict.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/predict.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
