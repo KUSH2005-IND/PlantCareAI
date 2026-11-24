@@ -1,0 +1,44 @@
+
+[
+  {
+    "classKey": "Apple___Black_rot",
+    "category": "Disease",
+    "nameEn": "Apple Black Rot",
+    "nameHi": "सेब का ब्लैक रॉट",
+    "chemicalDosageEn": "Consult the locally registered product label and agricultural expert before application. Dosage not yet verified.",
+    "chemicalDosageHi": "उपयोग से पहले स्थानीय रूप से पंजीकृत उत्पाद के लेबल और कृषि विशेषज्ञ से सलाह लें। खुराक अभी सत्यापित नहीं है।",
+    "organicRemedyEn": "Remove and safely dispose of affected plant material. Maintain orchard sanitation.",
+    "organicRemedyHi": "संक्रमित पौधों के हिस्सों को हटाकर सुरक्षित रूप से नष्ट करें और बगीचे की सफाई बनाए रखें।",
+    "preventionEn": "Prune affected branches and remove fallen infected fruit.",
+    "preventionHi": "संक्रमित शाखाओं की छंटाई करें और गिरे हुए संक्रमित फलों को हटाएं।",
+    "regionTag": "ALL"
+  },
+  {
+    "classKey": "Tomato___Early_blight",
+    "category": "Disease",
+    "nameEn": "Tomato Early Blight",
+    "nameHi": "टमाटर का अगेती झुलसा रोग",
+    "chemicalDosageEn": "No dosage is provided because a locally registered treatment has not been verified. Consult a local agricultural expert and follow the approved product label.",
+    "chemicalDosageHi": "स्थानीय रूप से पंजीकृत उपचार की पुष्टि न होने के कारण खुराक नहीं दी गई है। स्थानीय कृषि विशेषज्ञ से सलाह लें और स्वीकृत उत्पाद के लेबल का पालन करें।",
+    "organicRemedyEn": "Remove affected leaves and safely dispose of infected plant debris. Avoid overhead watering and keep foliage as dry as possible.",
+    "organicRemedyHi": "प्रभावित पत्तियों को हटाकर संक्रमित पौधों के अवशेषों को सुरक्षित रूप से नष्ट करें। ऊपर से पानी देने से बचें और पत्तियों को यथासंभव सूखा रखें।",
+    "preventionEn": "Maintain adequate spacing and airflow, rotate crops with non-host crops, use clean planting material, and remove infected plant debris.",
+    "preventionHi": "पौधों के बीच उचित दूरी और हवा का आवागमन बनाए रखें, गैर-मेज़बान फसलों के साथ फसल चक्र अपनाएं, स्वस्थ रोपण सामग्री का उपयोग करें और संक्रमित अवशेषों को हटाएं।",
+    "regionTag": "ALL"
+  },
+  {
+    "classKey": "Tomato___Septoria_leaf_spot",
+    "category": "Disease",
+    "nameEn": "Tomato Septoria Leaf Spot",
+    "nameHi": "टमाटर का सेप्टोरिया पत्ती धब्बा रोग",
+    "chemicalDosageEn": "No dosage provided. Consult a local agricultural expert and follow the locally approved product label.",
+    "chemicalDosageHi": "खुराक उपलब्ध नहीं है। स्थानीय कृषि विशेषज्ञ से सलाह लें और स्वीकृत उत्पाद के लेबल का पालन करें।",
+    "organicRemedyEn": "Remove infected lower leaves and safely dispose of plant debris. Avoid overhead irrigation and keep foliage dry.",
+    "organicRemedyHi": "संक्रमित निचली पत्तियों को हटाकर पौधों के अवशेष सुरक्षित रूप से नष्ट करें। ऊपर से सिंचाई करने से बचें और पत्तियों को सूखा रखें।",
+    "preventionEn": "Use healthy planting material, maintain good spacing and airflow, rotate crops, and avoid working with wet plants.",
+    "preventionHi": "स्वस्थ रोपण सामग्री का उपयोग करें, उचित दूरी और हवा का आवागमन बनाए रखें, फसल चक्र अपनाएं और गीले पौधों में काम करने से बचें।",
+    "regionTag": "ALL"
+  }
+
+
+]
