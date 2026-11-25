@@ -1,4 +1,33 @@
-flask
-tensorflow
-numpy
-pillow
+# PlantCareAI Python dependencies
+# Recommended interpreter: Python 3.11, 64-bit.
+# Full LiteRT conversion: use x86-64 Linux, WSL2, or a Linux Colab runtime.
+# Android APK dependencies are managed by Gradle in android-app/.
+
+# Flask app and local vision inference
+Flask>=3.1,<4
+Werkzeug>=3.1,<4
+tensorflow==2.20.*
+keras==3.13.2
+numpy>=2.0,<2.3
+Pillow>=10,<13
+opencv-python>=4.12,<5
+
+# Disease training, notebooks, and evaluation
+matplotlib>=3.9,<4
+pandas>=2.2,<3
+scikit-learn>=1.5,<2
+ipykernel>=6,<8
+
+# Pest training and evaluation
+torch>=2.4,<2.15
+torchvision>=0.19
+ultralytics==8.4.216
+PyYAML>=6,<7
+faster-coco-eval>=1.6,<2
+
+# Linux exporter and model inspection
+# The Ultralytics extra pulls LiteRT Torch, the interpreter, and the quantizer.
+ultralytics[export-litert]==8.4.216 ; sys_platform == "linux" and platform_machine == "x86_64"
+
+# Optional local Hugging Face tokenizer path in the advisory pilots
+transformers>=4.46,<5
