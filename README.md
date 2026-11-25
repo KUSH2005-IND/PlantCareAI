@@ -5,12 +5,13 @@ PlantCareAI combines **leaf disease classification, insect pest detection, and a
 | Component | Scope | Status |
 | --- | --- | --- |
 | Leaf disease classification | MobileNetV2 with 38 disease and healthy labels across 14 crop groups | Flask inference with the field-fine-tuned Keras model. A LiteRT export is available for edge deployment. |
-| Insect pest detection | YOLO26n LiteRT with 102 IP102 class IDs, host-crop filtering, and bounding boxes | Flask inference. Android pest integration and validation of the shipped detector are pending. |
+| Insect pest detection | YOLO26n LiteRT with 102 IP102 class IDs, host-crop filtering, and bounding boxes | Flask inference. The report shows an Android pest results screen. Validation of the packaged detector is pending. |
 | Crop advisory | English/Hindi reference content, regional filtering, signs, risk factors, and mitigation | Stage 1B SQLite lookup and the two-crop Python pilot are available. |
 | On-device LLM | Llama 3.2 1B Instruct, INT4, ExecuTorch/XNNPACK | Native inference has been demonstrated on Android. The full scan-to-advisory flow with validated Llama topic routing is pending. |
 
 ## Contents
 
+- [Final project report](#final-project-report)
 - [Demo images](#demo-images)
 - [Quick start](#quick-start)
 - [Offline advisory and Llama](#offline-advisory-and-llama)
@@ -19,6 +20,12 @@ PlantCareAI combines **leaf disease classification, insect pest detection, and a
 - [Training and evaluation](#training-and-evaluation)
 - [Repository layout](#repository-layout)
 - [Usage and licensing](#usage-and-licensing)
+
+## Final project report
+
+[Read the PlantCareAI final project report (PDF)](docs/AI-SoC-Kushagra_PS1_compressed.pdf)
+
+Prepared for **Bharat AI-SoC Challenge 2026–27 · PS1**. The report covers the offline Android architecture, model training and evaluation, the Llama advisory pilot, and the device benchmark protocol. The final page links to the demo video and APK. Section 8 distinguishes measured host CPU results from projected handset performance.
 
 ## Demo images
 
@@ -147,13 +154,13 @@ The training pipeline starts from a PlantVillage MobileNetV2 checkpoint. On Plan
 
 The [checked-in PlantDoc report](runs/disease/eval_plantdoc/metrics_summary.json) covers **472 test images across 27 evaluated classes**.
 
-| Model | Top-1 accuracy | Crop-aware accuracy |
-| --- | ---: | ---: |
-| PlantVillage checkpoint, zero-shot | 28.39% | 50.85% |
-| PlantDoc fine-tuned Keras | 60.59% | 79.24% |
-| Edge LiteRT export | 60.59% | 79.24% |
+| Model | Top-1 accuracy | Top-3 accuracy | Crop-aware Top-1 | Macro F1 |
+| --- | ---: | ---: | ---: | ---: |
+| PlantVillage checkpoint, zero-shot | 28.39% | 49.15% | 50.85% | 25.74% |
+| PlantDoc fine-tuned Keras | 60.59% | 83.05% | 79.24% | 59.55% |
+| Edge LiteRT export | 60.59% | 83.05% | 79.24% | 59.55% |
 
-![Crop baseline metrics](static/outputs/metric.png)
+![PlantVillage training and validation accuracy before PlantDoc fine-tuning](static/outputs/metric.png)
 
 ![PlantDoc accuracy comparison across the baseline, fine-tuned model, and edge export](runs/disease/eval_plantdoc/domain_shift_comparison.png)
 
@@ -168,7 +175,7 @@ The supplied YOLO26n run used AdamW, cosine scheduling, `640 × 640` inputs, a b
 | Validation | 1,518 | 1,873 | 0.599 | 0.370 | 0.528 | 0.631 |
 | Held-out test | 3,798 | 4,444 | 0.574 | 0.359 | 0.542 | 0.599 |
 
-These are reported offline training and evaluation results. Android speed and per-class detection performance need device-level validation of the shipped export. See the [YOLO26n notebook](notebook/pest_model_yolo26n.ipynb) for the training workflow.
+These are reported offline training and evaluation results. mAP50 averages class-level average precision at an intersection-over-union (IoU) threshold of 0.50. mAP50–95 averages across IoU thresholds from 0.50 to 0.95 in steps of 0.05. Android speed and per-class detection performance need device-level validation of the shipped export. See the [YOLO26n notebook](notebook/pest_model_yolo26n.ipynb) for the training workflow.
 
 #### Pest evaluation visuals
 
@@ -187,6 +194,7 @@ These are illustrative outputs from the project documentation.
 PlantCareAI/
 ├── app.py                         # Flask entry point
 ├── requirements.txt
+├── docs/                          # Final project report
 ├── models/
 │   ├── disease/                   # Keras and LiteRT exports
 │   ├── pest/                      # YOLO26n assets and experiment artifacts
