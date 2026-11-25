@@ -1,0 +1,5 @@
+<resources>
+  <string name="plantcare_show_predictions">பிற கணிப்புகளைக் காட்டு</string>
+  <string name="plantcare_hide_predictions">பிற கணிப்புகளை மறை</string>
+  <string name="plantcare_prediction_retake">மாதிரி மதிப்பெண் குறைவாக உள்ளது. இலையின் தெளிவான படத்தை எடுத்து மீண்டும் சரிபார்க்கவும்.</string>
+</resources>

@@ -1,3 +1,6 @@
 *.ipynb linguist-detectable=false
 notebook/** linguist-detectable=false
 templates/** linguist-detectable=false
+android-app/app/src/main/assets/llama/tokenizer_m33.bin -text -diff
+android-app/app/src/main/assets/whisper/ggml-base.bin filter=lfs diff=lfs merge=lfs -text
+android-app/app/src/main/assets/llama/assistant.pte filter=lfs diff=lfs merge=lfs -text

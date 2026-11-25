@@ -1,0 +1,5 @@
+<resources>
+  <string name="plantcare_show_predictions">ਹੋਰ ਅਨੁਮਾਨ ਵੇਖੋ</string>
+  <string name="plantcare_hide_predictions">ਹੋਰ ਅਨੁਮਾਨ ਲੁਕਾਓ</string>
+  <string name="plantcare_prediction_retake">ਮਾਡਲ ਸਕੋਰ ਘੱਟ ਹੈ। ਪੱਤੇ ਦੀ ਸਾਫ਼ ਫ਼ੋਟੋ ਲੈ ਕੇ ਮੁੜ ਜਾਂਚ ਕਰੋ।</string>
+</resources>
