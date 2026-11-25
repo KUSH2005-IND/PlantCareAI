@@ -57,7 +57,7 @@ import org.json.JSONObject
 fun PestResultContent(
     imageUri: Uri,
     onNewScan: () -> Unit,
-    onOpenSettings: () -> Unit
+    onAskAi: (PestDetection) -> Unit
 ) {
     val context = LocalContext.current.applicationContext
     val historyRepository = remember(context) {
@@ -267,7 +267,17 @@ fun PestResultContent(
                 Text(message, color = MaterialTheme.colorScheme.error)
             }
         }
-        Button(
+        results?.maxByOrNull { it.confidence }?.let { detection ->
+            Button(
+                onClick = { onAskAi(detection) },
+                enabled = !isSaving,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(stringResource(R.string.diagnosis_chat))
+            }
+        }
+
+        OutlinedButton(
             onClick = onNewScan,
             enabled = !isSaving && (errorMessage != null || results != null),
             modifier = Modifier.fillMaxWidth()

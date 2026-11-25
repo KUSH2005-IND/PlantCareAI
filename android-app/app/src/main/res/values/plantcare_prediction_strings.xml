@@ -1,0 +1,5 @@
+<resources>
+  <string name="plantcare_show_predictions">Show other predictions</string>
+  <string name="plantcare_hide_predictions">Hide other predictions</string>
+  <string name="plantcare_prediction_retake">Low model score. Try again with a clearer photo of the leaf.</string>
+</resources>

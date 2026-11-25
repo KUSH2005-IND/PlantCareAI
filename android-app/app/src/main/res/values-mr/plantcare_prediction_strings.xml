@@ -1,0 +1,5 @@
+<resources>
+  <string name="plantcare_show_predictions">इतर अंदाज पाहा</string>
+  <string name="plantcare_hide_predictions">इतर अंदाज लपवा</string>
+  <string name="plantcare_prediction_retake">मॉडेलचा गुण कमी आहे. पानाचा स्पष्ट फोटो घेऊन पुन्हा तपासा.</string>
+</resources>

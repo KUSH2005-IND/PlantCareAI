@@ -129,6 +129,7 @@ private fun SavedScanDetail(scan: ScanHistoryEntity) {
     val disease = remember(scan.severity) { scan.severity.snapshot("disease") }
     val boxes = pest?.optJSONArray("detections")
     val predictions = disease?.optJSONArray("predictions")
+    var showAlternatives by rememberSaveable(scan.id) { mutableStateOf(false) }
     val percent = remember { NumberFormat.getPercentInstance().apply { maximumFractionDigits = 1 } }
     var photoLoaded by remember(scan.imagePath) { mutableStateOf(false) }
     val photo by produceState<Bitmap?>(null, scan.imagePath) {
@@ -201,11 +202,23 @@ private fun SavedScanDetail(scan: ScanHistoryEntity) {
                     }
                 }
             }
-            predictions != null -> items(minOf(1, predictions.length())) { index ->
-                val prediction = predictions.optJSONObject(index)
-                if (prediction != null) {
-                    SavedScore(localizedDiseaseLabel(prediction.optString("diseaseName")),
-                        prediction.optDouble("confidence"), percent)
+            predictions != null -> {
+                items(minOf(if (showAlternatives) 3 else 1, predictions.length())) { index ->
+                    val prediction = predictions.optJSONObject(index)
+                    if (prediction != null) {
+                        SavedScore(localizedDiseaseLabel(prediction.optString("diseaseName")),
+                            prediction.optDouble("confidence"), percent)
+                    }
+                }
+                if (predictions.length() > 1) {
+                    item {
+                        TextButton(onClick = { showAlternatives = !showAlternatives }) {
+                            Text(stringResource(
+                                if (showAlternatives) R.string.plantcare_hide_predictions
+                                else R.string.plantcare_show_predictions
+                            ))
+                        }
+                    }
                 }
             }
             scan.pestSummary.isNotBlank() -> item { Text(scan.pestSummary) }
