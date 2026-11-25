@@ -1,0 +1,5 @@
+<resources>
+  <string name="plantcare_show_predictions">अन्य अनुमान देखें</string>
+  <string name="plantcare_hide_predictions">अन्य अनुमान छिपाएँ</string>
+  <string name="plantcare_prediction_retake">मॉडल स्कोर कम है। पत्ती की साफ़ फ़ोटो लेकर फिर जाँचें।</string>
+</resources>

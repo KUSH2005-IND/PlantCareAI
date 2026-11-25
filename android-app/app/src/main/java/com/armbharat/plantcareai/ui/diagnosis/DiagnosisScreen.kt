@@ -51,6 +51,7 @@ fun DiagnosisScreen(
     onAskAi: (DiseasePrediction) -> Unit
 ) {
 
+    var showAlternatives by rememberSaveable(imageUri.toString()) { mutableStateOf(false) }
     val context = LocalContext.current
     val historyRepository = remember(context.applicationContext) {
         ScanHistoryRepository(
@@ -171,7 +172,7 @@ fun DiagnosisScreen(
                 }
             }
 
-            prediction = result.first.take(1)
+            prediction = result.first.take(3)
             severityResult = result.second
 
         } catch (e: Exception) {
@@ -307,7 +308,8 @@ fun DiagnosisScreen(
 
                     prediction.isNotEmpty() -> {
 
-                        prediction.forEachIndexed { index, item ->
+                        prediction.take(if (showAlternatives) 3 else 1).forEachIndexed { index, item ->
+                            if (index > 0) HorizontalDivider()
 
                             val diseaseName = item.diseaseName
                                 .replace("___", " - ")
@@ -335,8 +337,14 @@ fun DiagnosisScreen(
                                 )
                             }
 
-                            if (index != prediction.lastIndex) {
-                                HorizontalDivider()
+                        }
+
+                        if (prediction.size > 1) {
+                            TextButton(onClick = { showAlternatives = !showAlternatives }) {
+                                Text(stringResource(
+                                    if (showAlternatives) R.string.plantcare_hide_predictions
+                                    else R.string.plantcare_show_predictions
+                                ))
                             }
                         }
 
@@ -346,11 +354,13 @@ fun DiagnosisScreen(
                             )
                         )
 
-                        if (prediction.first().confidence < 0.60f) {
+                        val topScore = prediction.first().confidence
+                        if (topScore < 0.60f) {
 
                             Text(
-                                text = "Low model score. Please capture a clearer leaf image and check again.",
-                                color = MaterialTheme.colorScheme.error
+                                text = stringResource(R.string.plantcare_prediction_retake),
+                                color = if (topScore < 0.40f) MaterialTheme.colorScheme.error
+                                else MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     }

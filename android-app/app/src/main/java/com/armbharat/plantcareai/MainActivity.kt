@@ -27,7 +27,7 @@ import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Email
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.List
 import androidx.compose.material.icons.outlined.Search
@@ -48,6 +48,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
@@ -298,9 +299,16 @@ class MainActivity : AppCompatActivity() {
                                             selectedTab = "scan"
                                             currentScreen = "camera"
                                         },
-                                        onOpenSettings = {
-                                            selectedTab = "home"
-                                            currentScreen = "settings"
+                                        onAskAi = { detection ->
+                                            assistantScanId++
+                                            assistantDiseaseKey = null
+                                            assistantDiseaseConfidence = detection.confidence
+                                            assistantSavedScanId = null
+                                            assistantSavedScanName = detection.label
+                                                .replaceFirstChar { it.titlecase() }
+                                            assistantSavedPhotoPath = null
+                                            selectedTab = "assistant"
+                                            currentScreen = "llama"
                                         }
                                     )
                                 } else {
@@ -329,7 +337,8 @@ class MainActivity : AppCompatActivity() {
                             "llama" -> {
                                 val chatKey = when {
                                     assistantSavedScanId != null -> "assistant_saved_$assistantSavedScanId"
-                                    assistantDiseaseKey != null -> "assistant_scan_$assistantScanId"
+                                    assistantDiseaseKey != null || assistantSavedScanName != null ->
+                                        "assistant_scan_$assistantScanId"
                                     else -> "assistant_chat"
                                 }
 
@@ -422,10 +431,10 @@ private fun FloatingBottomBar(
     onTabSelected: (String) -> Unit
 ) {
     val tabs = listOf(
-        Triple("home", stringResource(R.string.nav_home), Icons.Outlined.Home),
-        Triple("scan", stringResource(R.string.nav_scan), Icons.Outlined.Search),
-        Triple("assistant", stringResource(R.string.nav_assistant), Icons.Outlined.Email),
-        Triple("output", stringResource(R.string.nav_output), Icons.Outlined.List)
+        Triple("home", stringResource(R.string.nav_home), rememberVectorPainter(Icons.Outlined.Home)),
+        Triple("scan", stringResource(R.string.nav_scan), rememberVectorPainter(Icons.Outlined.Search)),
+        Triple("assistant", stringResource(R.string.nav_assistant), painterResource(R.drawable.ic_plantcare_chat)),
+        Triple("output", stringResource(R.string.nav_output), rememberVectorPainter(Icons.Outlined.List))
     )
     val colors = MaterialTheme.colorScheme
     val pillShape = RoundedCornerShape(32.dp)
@@ -480,7 +489,7 @@ private fun FloatingBottomBar(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Icon(
-                                imageVector = icon,
+                                painter = icon,
                                 contentDescription = if (selected) null else label,
                                 modifier = Modifier.size(20.dp),
                                 tint = tint
